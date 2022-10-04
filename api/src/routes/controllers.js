@@ -17,7 +17,7 @@ async function getAllCharacters() {
         species: e.especies,
         origin: e.origin.name,
         image: e.image,
-        created: false,
+        created: e.created,
       };
     });
 
@@ -37,9 +37,16 @@ async function getAllCharacters() {
 async function createCharacter(name, species, origin, image) {
   try {
     if (!name) throw new Error('Debe ingresar un nombre.');
+    if (name.length < 2)
+      throw new Error('El nombre debe contener la menos dos letras.');
     name = name[0].toUpperCase().concat(name.slice(1));
-    await Character.create({ name, species, origin, image });
-    return `${name} creado exitosamente.`;
+    const [user, created] = await Character.findOrCreate({
+      where: { name },
+      defaults: { name, species, origin, image },
+    });
+    return created
+      ? `${name} creado exitosamente.`
+      : `El personaje ${name} ya existe.`;
   } catch (error) {
     return error.message;
   }
@@ -84,7 +91,6 @@ async function getCharacterById(id) {
       species: apiInfo.especies,
       origin: apiInfo.origin.name,
       image: apiInfo.image,
-      created: false,
     };
   } catch (error) {
     return 'No existe un personaje relacionado a ese ID.';

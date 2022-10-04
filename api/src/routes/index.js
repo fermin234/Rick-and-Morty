@@ -1,6 +1,6 @@
 const { Router } = require('express');
-const characters = require('./characters');
-const episodes = require('./episodes');
+const characters = require('./charactersRouters.js');
+const episodes = require('./episodesRouters.js');
 
 const router = Router();
 

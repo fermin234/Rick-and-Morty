@@ -1,5 +1,4 @@
 const { Router } = require('express');
-const axios = require('axios');
 const { getEpisodes } = require('./controllers');
 
 const router = Router();

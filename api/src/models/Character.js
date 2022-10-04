@@ -25,8 +25,8 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
       },
       created: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
+        type: DataTypes.DATEONLY,
+        defaultValue: DataTypes.NOW,
       },
     },
     { timestamps: false }
