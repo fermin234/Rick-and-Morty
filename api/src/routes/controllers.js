@@ -96,6 +96,7 @@ async function getCharacterById(id) {
     return 'No existe un personaje relacionado a ese ID.';
   }
 }
+//asd
 module.exports = {
   getAllCharacters,
   createCharacter,
