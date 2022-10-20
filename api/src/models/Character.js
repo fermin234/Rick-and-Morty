@@ -23,6 +23,7 @@ module.exports = (sequelize) => {
       },
       image: {
         type: DataTypes.STRING,
+        defaultValue: `https://rickandmortyapi.com/api/character/avatar/19.jpeg`,
       },
       created: {
         type: DataTypes.DATEONLY,

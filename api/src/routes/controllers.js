@@ -8,27 +8,53 @@ async function getAllCharacters() {
   try {
     //creacion de un character
     // await Character.create({ name: 'fermin' });
-    //peticion a la api
-    let apiInfo = await axios.get(`https://rickandmortyapi.com/api/character`);
-    apiInfo = apiInfo.data.results.map((e) => {
-      return {
-        id: e.id,
-        name: e.name,
-        species: e.especies,
-        origin: e.origin.name,
-        image: e.image,
-        created: e.created,
-      };
-    });
 
-    //peticion a la DB
-    apiInfo = apiInfo.concat(
+    //peticion a la api
+    let apiInfo2 = [];
+    //cambiar esto por si el dia de maniana se agrega una nueva pagina.
+    for (let i = 1; i < 43; i++) {
+      apiInfo2 = [
+        ...apiInfo2,
+        `https://rickandmortyapi.com/api/character?page=${i}`,
+      ];
+    }
+    apiInfo2 = apiInfo2?.map((e) => axios.get(e));
+    apiInfo2 = await axios.all(apiInfo2);
+    apiInfo2 = apiInfo2
+      .map((e) =>
+        e.data.results?.map((e) => {
+          return {
+            id: e.id,
+            name: e.name,
+            species: e.species,
+            origin: e.origin.name.split(' ')[0],
+            image: e.image,
+            created: e.created,
+          };
+        })
+      )
+      .flat(1);
+
+    // let apiInfo = await axios.get(`https://rickandmortyapi.com/api/character`);
+    // apiInfo = apiInfo.data.results.map((e) => {
+    //   return {
+    //     id: e.id,
+    //     name: e.name,
+    //     species: e.species,
+    //     origin: e.origin.name.split(' ')[0],
+    //     image: e.image,
+    //     created: e.created,
+    //   };
+    // });
+
+    // //peticion a la DB
+    apiInfo2 = apiInfo2.concat(
       await Character.findAll({
         includes: [Episode],
       })
     );
 
-    return apiInfo;
+    return apiInfo2;
   } catch (error) {
     return error;
   }
@@ -38,12 +64,15 @@ async function createCharacter(name, species, origin, image) {
   try {
     if (!name) throw new Error('Debe ingresar un nombre.');
     if (name.length < 2)
-      throw new Error('El nombre debe contener la menos dos letras.');
+      throw new Error('El nombre debe contener al menos dos letras.');
+
     name = name[0].toUpperCase().concat(name.slice(1));
+
     const [user, created] = await Character.findOrCreate({
       where: { name },
       defaults: { name, species, origin, image },
     });
+
     return created
       ? `${name} creado exitosamente.`
       : `El personaje ${name} ya existe.`;
@@ -51,7 +80,7 @@ async function createCharacter(name, species, origin, image) {
     return error.message;
   }
 }
-
+//hacer el pedido a todas las paginas
 async function getEpisodes() {
   try {
     //veo si en la db tengo algun episode
